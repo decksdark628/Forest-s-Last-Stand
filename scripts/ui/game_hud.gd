@@ -1,6 +1,4 @@
 extends CanvasLayer
-
-# Referencias de UI 
 @onready var day_hub: PanelContainer = $DayHud
 @onready var night_hub: PanelContainer = $NightHud
 @onready var day_label: Label = $DayHud/MarginContainer/HBoxContainer/Day/DayLabel
@@ -46,7 +44,6 @@ func _ready() -> void:
 	if placement_menu:
 		archer_button = placement_menu.find_child("ArcherButton", true, false)
 		soldier_button = placement_menu.find_child("SoldierButton", true, false)
-		# Find veteran buttons from MenuMejorado
 		var menu_mejorado = placement_menu.find_child("MenuMejorado", true, false)
 		if menu_mejorado:
 			veteran_soldier_button = menu_mejorado.find_child("VeteranSoldierButton", true, false)
@@ -55,8 +52,6 @@ func _ready() -> void:
 
 		archer_button = get_node_or_null("ArcherButton")
 		soldier_button = get_node_or_null("SoldierButton")
-	# Note: Button connections are handled by placement_menu.gd, not here
-	# We only need to find references if we need them later
 
 	units_menu = find_child("UnitsMenu", true, false)
 	spells_menu = find_child("SpellsMenu", true, false)
@@ -109,8 +104,6 @@ func _ready() -> void:
 			units_menu.visible = not game_manager.is_night and in_world
 		if spells_menu:
 			spells_menu.visible = game_manager.is_night and in_world
-
-		# Refrescar visibilidad un frame después para asegurar que GameManager ya tiene current_location (p. ej. en town)
 		call_deferred("_refresh_units_menu_visibility")
 
 	var resource_manager = get_tree().get_root().find_child("ResourceManager", true, false)
@@ -144,8 +137,6 @@ func update_hud_visibility(is_night: bool, current_location: String = "world") -
 
 	if start_defend_button:
 		start_defend_button.visible = not is_night and in_world
-
-	# Menú de unidades solo de día en world (nunca en town)
 	if placement_menu:
 		placement_menu.visible = not is_night and in_world
 	if units_menu:
@@ -212,7 +203,6 @@ func _on_start_defend_pressed() -> void:
 		game_manager.start_defense()
 
 func _on_day_started(_day: int) -> void:
-	# Día solo ocurre en world; menú de unidades visible solo de día en world
 	update_hud_visibility(false, "world")
 	if start_defend_button:
 		start_defend_button.visible = true
@@ -244,11 +234,6 @@ func _on_night_started() -> void:
 func _on_wave_updated(enemies_remaining: int, _current_wave: int) -> void:
 	"""Llamado cuando se actualiza el estado de la oleada"""
 	update_remaining_enemies(enemies_remaining)
-
-# Note: Unit placement button handlers are managed by placement_menu.gd
-# Game HUD only manages the display of resources, day/night info, etc.
-
-# Early return - these methods are no longer used as placement_menu.gd handles button connections
 func _on_archer_pressed() -> void:
 	pass # Handled by placement_menu.gd
 
@@ -260,14 +245,10 @@ func _on_veteran_archer_pressed() -> void:
 
 func _on_veteran_soldier_pressed() -> void:
 	pass # Handled by placement_menu.gd
-
-# ------------------------------------------------------------------------------
 func _on_save_pressed() -> void:
 	var gm = get_tree().get_first_node_in_group("game_manager")
 	if gm and gm.has_method("save_game"):
 		gm.save_game()
-
-# ------------------------------------------------------------------------------
 func _on_load_pressed() -> void:
 	var gm = get_tree().get_first_node_in_group("game_manager")
 	if gm and gm.has_method("load_game"):
@@ -278,8 +259,6 @@ func show_wave_complete_message(wave: int) -> void:
 	if success_message:
 		success_message.text = "¡DEFENSA EXITOSA! ¡Oleada %d completada!" % wave
 		success_message.visible = true
-		
-		# Desvanecer después de 2 segundos
 		await get_tree().create_timer(1.5).timeout
 		if success_message:
 			var tween = create_tween()

@@ -19,7 +19,3 @@ func _input(event: InputEvent):
 			animation_player.play("hit")
 		elif event.is_action_released("ui_accept"):
 			animation_player.play("release")
-		#if(event.is_action_pressed("rhythm_game_key_2")):
-			#key_pressed.emit(2)
-		#if(event.is_action_pressed("rhythm_game_key_3")):
-			#key_pressed.emit(3)

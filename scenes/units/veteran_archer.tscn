@@ -1,14 +1,16 @@
-[gd_scene load_steps=90 format=3 uid="uid://ccrt8nin1e3q0"]
+[gd_scene load_steps=93 format=3 uid="uid://ccrt8nin1e3q0"]
 
 [ext_resource type="Script" uid="uid://wr3gyiagx427" path="res://scripts/units/base_unit.gd" id="1_5j5yn"]
-[ext_resource type="Script" path="res://scripts/components/sound_component.gd" id="SoundComp_SCRIPT"]
 [ext_resource type="PackedScene" uid="uid://dpd4jx3yg16dt" path="res://scenes/elements/projectile.tscn" id="2_w1gai"]
 [ext_resource type="Script" uid="uid://dvhqgghmcj6al" path="res://scripts/components/health_component.gd" id="3_4w3rp"]
 [ext_resource type="Script" uid="uid://brjkec8lpyla6" path="res://scripts/components/movement_component.gd" id="4_ldnwv"]
 [ext_resource type="Script" uid="uid://wiwp5n7puq5c" path="res://scripts/components/attack_component.gd" id="5_s6n72"]
-[ext_resource type="Script" path="res://scripts/components/animation_component.gd" id="6_vx3qh"]
 [ext_resource type="Texture2D" uid="uid://dfll5228yj1qn" path="res://assets/art/characters/Mage-Red.png" id="7_5j5yn"]
-[ext_resource type="Script" path="res://scripts/components/animation_component.gd" id="8_atkd6"]
+[ext_resource type="Script" uid="uid://jkh6cfypyvky" path="res://scripts/components/animation_component.gd" id="8_atkd6"]
+[ext_resource type="AudioStream" uid="uid://dacvbpx7iu55u" path="res://assets/sound/attacks_and_mosnters/arrow-swish_02.mp3" id="9_ldnwv"]
+[ext_resource type="AudioStream" uid="uid://d34ewjdwwwnuw" path="res://assets/sound/attacks_and_mosnters/human_pain_3.wav" id="10_s6n72"]
+[ext_resource type="AudioStream" uid="uid://b0pvmejs4y82s" path="res://assets/sound/attacks_and_mosnters/human_pain_2.wav" id="11_vx3qh"]
+[ext_resource type="Script" uid="uid://c3mlvtl03wubw" path="res://scripts/components/sound_component.gd" id="SoundComp_SCRIPT"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_w1gai"]
 atlas = ExtResource("7_5j5yn")
@@ -715,7 +717,7 @@ attack_cooldown = 1.5
 projectile_scene = ExtResource("2_w1gai")
 
 [node name="AnimationComponent" type="Node" parent="."]
-script = ExtResource("6_vx3qh")
+script = ExtResource("8_atkd6")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_1yd5l")
@@ -750,3 +752,6 @@ position = Vector2(0, 7)
 
 [node name="SoundComponent" type="Node2D" parent="."]
 script = ExtResource("SoundComp_SCRIPT")
+attack_sound = ExtResource("9_ldnwv")
+death_sound = ExtResource("10_s6n72")
+hit_sound = ExtResource("11_vx3qh")

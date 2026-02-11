@@ -1,7 +1,5 @@
 class_name EnemyConfig
 extends Node
-
-# Configuración centralizada de enemigos
 const ENEMIES := {
 	"basic": {
 		"scene": "res://scenes/enemies/orc_peon.tscn",
@@ -38,7 +36,6 @@ static func types_for_wave(wave: int) -> Array:
 	return types
 
 static func enemy_count_for_wave(wave: int) -> int:
-	#var base = 3.0 + wave * 1.5
 	var base = 1.0
 	var extra = pow(wave * 0.8, 1.5)
 	var max_e = 50 + wave * 2

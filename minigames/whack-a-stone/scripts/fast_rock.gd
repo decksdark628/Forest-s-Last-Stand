@@ -10,7 +10,6 @@ const MAX_HP:int = 5
 
 func _ready() -> void:
 	hp = MAX_HP
-	#hitbox.disabled = true
 	var tw = create_tween()
 	tw.tween_property(
 		visuals,
@@ -25,10 +24,6 @@ func _ready() -> void:
 		START_POS.y,
 		APPEAR_ANIM_TIME
 	)
-	#await get_tree().create_timer(0.9).timeout
-	#hitbox.disabled = false
-	#await get_tree().create_timer(1.2).timeout
-	#hitbox.disabled = true
 	
 	var rand_wait:float = randf_range(2, 7)
 	await get_tree().create_timer(rand_wait).timeout

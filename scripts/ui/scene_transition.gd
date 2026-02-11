@@ -1,6 +1,4 @@
 extends Node
-## Autoload: transición entre escenas con fade negro.
-## Uso: await transition_to_scene(duracion, callable_que_guarda_y_cambia_escena)
 
 signal fade_out_finished
 signal fade_in_finished
@@ -9,7 +7,6 @@ var _overlay: ColorRect
 var _canvas: CanvasLayer
 
 func _ready() -> void:
-	# Seguir procesando cuando el árbol está pausado (p. ej. minijuego woodchopper) para que fade_in se ejecute
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_canvas = CanvasLayer.new()
 	_canvas.layer = 200

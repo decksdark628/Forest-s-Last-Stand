@@ -1,4 +1,4 @@
-[gd_scene load_steps=90 format=3 uid="uid://bmqkx60sn6tkf"]
+[gd_scene load_steps=93 format=3 uid="uid://bmqkx60sn6tkf"]
 
 [ext_resource type="Script" uid="uid://wr3gyiagx427" path="res://scripts/units/base_unit.gd" id="1_1voyx"]
 [ext_resource type="Texture2D" uid="uid://duw0me013usir" path="res://assets/art/characters/Human-Worker-Cyan.png" id="2_5iiku"]
@@ -7,6 +7,9 @@
 [ext_resource type="Script" uid="uid://brjkec8lpyla6" path="res://scripts/components/movement_component.gd" id="5_movement"]
 [ext_resource type="Script" uid="uid://wiwp5n7puq5c" path="res://scripts/components/attack_component.gd" id="6_attack"]
 [ext_resource type="Script" uid="uid://jkh6cfypyvky" path="res://scripts/components/animation_component.gd" id="7_animation"]
+[ext_resource type="AudioStream" uid="uid://crl2kkck8favl" path="res://assets/sound/attacks_and_mosnters/sword_attack_1.wav" id="9_2vmbf"]
+[ext_resource type="AudioStream" uid="uid://d34ewjdwwwnuw" path="res://assets/sound/attacks_and_mosnters/human_pain_3.wav" id="10_nfbd1"]
+[ext_resource type="AudioStream" uid="uid://dfaan148n42a0" path="res://assets/sound/attacks_and_mosnters/human_pain_1.wav" id="11_7ffbf"]
 [ext_resource type="Script" uid="uid://c3mlvtl03wubw" path="res://scripts/components/sound_component.gd" id="SoundComp_SCRIPT"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_e84y0"]
@@ -743,3 +746,6 @@ show_percentage = false
 
 [node name="SoundComponent" type="Node2D" parent="."]
 script = ExtResource("SoundComp_SCRIPT")
+attack_sound = ExtResource("9_2vmbf")
+death_sound = ExtResource("10_nfbd1")
+hit_sound = ExtResource("11_7ffbf")

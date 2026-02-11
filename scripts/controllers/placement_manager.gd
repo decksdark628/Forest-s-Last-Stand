@@ -11,8 +11,6 @@ var unit_scenes: Dictionary = {
 var is_placing: bool = false
 var pending_unit_type: String = ""
 var placement_ghost: Node2D = null
-
-# Zonas de colocación (world): nodos Area2D con CollisionPolygon2D
 var _soldier_placement_area: Area2D = null
 var _archer_placement_area: Area2D = null
 
@@ -28,14 +26,10 @@ func start_placement(unit_type: String):
 	if not unit_scenes.has(unit_type):
 		push_error("Unit type not found: " + unit_type)
 		return
-	
-	# Clean up any existing ghost
 	cancel_placement()
 	
 	is_placing = true
 	pending_unit_type = unit_type
-	
-	# Create ghost
 	placement_ghost = Node2D.new()
 	placement_ghost.name = "PlacementGhost"
 	
@@ -90,10 +84,8 @@ func _is_valid_placement(pos: Vector2) -> bool:
 	var gm = get_parent()
 	if gm and "is_night" in gm and gm.is_night:
 		return false
-	# Restricción por tipo: soldier solo en SoldierPlacement, archer solo en ArcherPlacement
 	if not _is_position_in_placement_zone(pos, pending_unit_type):
 		return false
-	# Evitar superposición con otras unidades aliadas
 	for u in get_tree().get_nodes_in_group("friendly_units"):
 		if is_instance_valid(u) and u is Node2D:
 			if (u as Node2D).global_position.distance_to(pos) < 24.0:
@@ -107,7 +99,6 @@ func update_ghost_position(position: Vector2):
 		var ok = _is_valid_placement(snaped)
 		var spr = placement_ghost.get_node_or_null("GhostSprite") as Sprite2D
 		if spr:
-			# Verde si zona válida, rojo si fuera de zona permitida o inválido
 			spr.modulate = Color(0, 1, 0, 0.5) if ok else Color(1, 0, 0, 0.5)
 
 func _is_position_in_placement_zone(global_pos: Vector2, unit_type: String) -> bool:

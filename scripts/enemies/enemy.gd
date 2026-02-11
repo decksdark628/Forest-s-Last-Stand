@@ -19,174 +19,141 @@ class_name Enemy
 @onready var health_bar: Range = get_node_or_null(health_bar_path)
 @onready var hit_box: Area2D = get_node_or_null(hit_box_path) if has_node(hit_box_path) else null
 
-# Enemy state
-var target: Node2D = null
-var last_target_position: Vector2 = Vector2.ZERO
-var is_active: bool = true
-var is_attacking: bool = false
-var attack_animation_timer: float = 0.0
-var last_aggro_target: Node2D = null
+const DEFAULT_ATTACK_COOLDOWN: float = 0.5
+const REACHED_END_DISTANCE: float = 50.0
 
 @export var max_health: int = 30
 @export var speed: float = 50.0
 @export var damage: int = 10
 @export var gold_value: int = 5
+@export var enemy_type: String = "basic"
 
-@export var enemy_type: String = "basic"  # "basic", "tank", "explorer" etc.
+var target: Node2D = null
+var is_active: bool = true
+var is_attacking: bool = false
+var attack_animation_timer: float = 0.0
 
-# Signals
 signal died(enemy)
 signal reached_end
 
-func _ready():
+func _ready() -> void:
 	add_to_group("enemies")
-	
-	_ensure_components()
-	
-	if health_component:
-		health_component.max_health = max_health
-		health_component.current_health = max_health
-		health_component.died.connect(_on_died)
-		health_component.health_changed.connect(_on_health_changed)
-	
-	if hit_box:
-		if not hit_box.area_entered.is_connected(_on_hit_box_entered):
-			hit_box.area_entered.connect(_on_hit_box_entered)
-	
-	if attack_component:
-		attack_component.damage = damage
-		attack_component.attacked.connect(_on_attacked)
-	
+	_initialize_components()
+	_initialize_health()
+	_initialize_hit_box()
+	_initialize_attack_component()
+	_initialize_movement()
+
+func _initialize_components() -> void:
 	if aggro_component:
 		aggro_component.enemy_type = enemy_type
-	
+
+func _initialize_health() -> void:
+	if not health_component:
+		return
+	health_component.max_health = max_health
+	health_component.current_health = max_health
+	health_component.died.connect(_on_died)
+	health_component.health_changed.connect(_on_health_changed)
+
+func _initialize_hit_box() -> void:
+	if hit_box and not hit_box.area_entered.is_connected(_on_hit_box_entered):
+		hit_box.area_entered.connect(_on_hit_box_entered)
+
+func _initialize_attack_component() -> void:
+	if not attack_component:
+		return
+	attack_component.damage = damage
+	attack_component.attacked.connect(_on_attacked)
+
+func _initialize_movement() -> void:
 	if movement_component:
 		movement_component.speed = speed
-	
-	# Find initial target
+	_find_initial_target()
+
+func _find_initial_target() -> void:
 	var possible_targets = get_tree().get_nodes_in_group("target")
 	if not possible_targets.is_empty():
 		target = possible_targets[0]
 		if movement_component:
 			movement_component.set_target_position(target.global_position)
 
-func _ensure_components():
-	# 1. AggroComponent
-	if not aggro_component:
-		var aggro_node = get_node_or_null("AggroComponent")
-		if not aggro_node:
-			aggro_node = AggroComponent.new()
-			aggro_node.name = "AggroComponent"
-			add_child(aggro_node)
-		aggro_component = aggro_node
-	
-	# 2. AnimationComponent
-	if not animation_component:
-		var anim_node = get_node_or_null("AnimationComponent")
-		if not anim_node:
-			anim_node = get_node_or_null("AnimationManager")
-		animation_component = anim_node
-
-	# 3. HealthComponent
-	if not health_component:
-		var health_node = get_node_or_null("HealthComponent")
-		if not health_node:
-			health_node = HealthComponent.new()
-			health_node.name = "HealthComponent"
-			add_child(health_node)
-		health_component = health_node
-
-	# 4. MovementComponent
-	if not movement_component:
-		var move_node = get_node_or_null("MovementComponent")
-		if not move_node:
-			move_node = MovementComponent.new()
-			move_node.name = "MovementComponent"
-			add_child(move_node)
-			move_node.character_body = self
-			if move_node.navigation_agent_path.is_empty():
-				var nav = get_node_or_null("NavigationAgent2D")
-				if nav: move_node.navigation_agent = nav
-		movement_component = move_node
-
-	# 5. AttackComponent
-	if not attack_component:
-		var atk_node = get_node_or_null("AttackComponent")
-		if not atk_node:
-			atk_node = AttackComponent.new()
-			atk_node.name = "AttackComponent"
-			add_child(atk_node)
-		attack_component = atk_node
-	
-	# 6. SoundComponent
-	if not sound_component:
-		var snd_node = get_node_or_null("SoundComponent")
-		if not snd_node:
-			snd_node = SoundComponent.new()
-			snd_node.name = "SoundComponent"
-			add_child(snd_node)
-		sound_component = snd_node
-
-func _on_health_changed(new_health: int, _max_val: int):
+func _on_health_changed(new_health: int, _max_health: int) -> void:
 	if health_bar:
 		health_bar.value = new_health
 
-func _physics_process(delta: float):
+func _physics_process(delta: float) -> void:
 	if not is_active:
-		return 
+		return
+	
+	_update_attack_animation(delta)
+	
+	var current_target = _get_current_target()
+	if not is_instance_valid(current_target):
+		return
+	
+	var distance = global_position.distance_to(current_target.global_position)
+	
+	if _should_attack(distance):
+		_execute_attack(current_target)
+	elif movement_component:
+		_move_toward_target(current_target, delta)
+	
+	_update_animation(current_target, distance)
+	_check_reached_end(current_target, distance)
 
+func _update_attack_animation(delta: float) -> void:
 	if attack_animation_timer > 0:
 		attack_animation_timer -= delta
 		if attack_animation_timer <= 0:
-			is_attacking = false 
+			is_attacking = false
 
-	var current_aggro_target = aggro_component.get_current_target() if aggro_component else null
-	var current_target = current_aggro_target if is_instance_valid(current_aggro_target) else target 
+func _get_current_target() -> Node2D:
+	var aggro_target = aggro_component.get_current_target() if aggro_component else null
+	if is_instance_valid(aggro_target):
+		return aggro_target
 	
-	if not is_instance_valid(current_target):
-		var possible_targets = get_tree().get_nodes_in_group("target")
-		if not possible_targets.is_empty():
-			target = possible_targets[0] 
-			current_target = target
-		else:
-			return
-
-	var distance = global_position.distance_to(current_target.global_position)
+	if is_instance_valid(target):
+		return target
 	
-	if attack_component:
+	_find_initial_target()
+	return target
 
-		attack_component.target = current_target 
-		
-		if distance <= attack_component.attack_range:
-			# Dentro del rango de ataque
-			# Detener movimiento al entrar en estado de ataque
-			if movement_component:
-				# cancelar objetivo de movimiento y detener agente
-				movement_component.has_target = false
-				if movement_component.navigation_agent:
-					movement_component.navigation_agent.set_velocity(Vector2.ZERO)
-					movement_component.navigation_agent.target_position = global_position
-				# detener la velocidad física
-				velocity = Vector2.ZERO
-				move_and_slide()
-			if attack_component.can_attack():
-				attack_component.perform_attack() 
-				is_attacking = true
-				attack_animation_timer = 0.5 
-		
-		elif movement_component:
-			movement_component.set_target_position(current_target.global_position) 
-			movement_component.move_towards_target(delta) 
+func _should_attack(distance: float) -> bool:
+	return attack_component and distance <= attack_component.attack_range
 
-	if animation_component:
-		var move_dir = velocity.normalized()
-		animation_component.update_animation(move_dir, is_attacking, current_target) 
+func _execute_attack(current_target: Node2D) -> void:
+	attack_component.set_target(current_target)
+	if movement_component:
+		if "clear_target" in movement_component:
+			movement_component.clear_target()
+		# ensure the character body stops immediately
+		velocity = Vector2.ZERO
+		move_and_slide()
+	
+	if attack_component.can_attack():
+		attack_component.perform_attack()
+		is_attacking = true
+		attack_animation_timer = DEFAULT_ATTACK_COOLDOWN
 
-	if not current_aggro_target and target and distance < 50.0:
+func _move_toward_target(current_target: Node2D, delta: float) -> void:
+	movement_component.set_target_position(current_target.global_position)
+	movement_component.move_towards_target(delta)
+
+func _update_animation(current_target: Node2D, distance: float) -> void:
+	if not animation_component:
+		return
+	var move_dir = velocity.normalized()
+	animation_component.update_animation(move_dir, is_attacking, current_target)
+
+func _check_reached_end(current_target: Node2D, distance: float) -> void:
+	if aggro_component and aggro_component.has_aggro_targets():
+		return
+	if distance < REACHED_END_DISTANCE:
 		reached_end.emit()
-		_on_died() 
+		_on_died()
 
-func _on_died(_unit=null):
+func _on_died(_unit = null) -> void:
 	if not is_active:
 		return
 	is_active = false
@@ -194,40 +161,47 @@ func _on_died(_unit=null):
 	
 	if sound_component:
 		sound_component.play_death()
-
-	if animation_component:
-		await animation_component.play_death()
 	
+	await _play_death_animation()
 	queue_free()
 
-func _on_attacked(target: Node2D):
+func _play_death_animation() -> void:
+	if animation_component:
+		await animation_component.play_death()
+
+func _on_attacked(target_node: Node2D) -> void:
 	is_attacking = true
-	attack_animation_timer = 0.5
+	attack_animation_timer = DEFAULT_ATTACK_COOLDOWN
 	if sound_component:
 		sound_component.play_attack()
 
-func _on_hit_box_entered(area: Area2D):
+func _on_hit_box_entered(area: Area2D) -> void:
 	if area.is_in_group("projectiles"):
-		if "damage" in area:
-			if health_component:
-				health_component.take_damage(area.damage)
-				if sound_component: sound_component.play_hit()
+		_apply_projectile_damage(area)
 		area.queue_free()
 
-func set_aggro_target(unit: Node2D):
+func _apply_projectile_damage(projectile: Area2D) -> void:
+	if "damage" not in projectile:
+		return
+	if health_component:
+		health_component.take_damage(projectile.damage)
+	if sound_component:
+		sound_component.play_hit()
+
+func set_aggro_target(unit: Node2D) -> void:
 	if aggro_component:
 		aggro_component.set_aggro_target(unit)
 
-func clear_aggro_target(unit: Node2D):
+func clear_aggro_target(unit: Node2D) -> void:
 	if aggro_component:
 		aggro_component.clear_aggro_target(unit)
 
-func take_damage(amount: int):
+func take_damage(amount: int) -> void:
 	if health_component:
 		health_component.take_damage(amount)
-		if sound_component: sound_component.play_hit()
+	if sound_component:
+		sound_component.play_hit()
 
 func set_speed_modifier(modifier: float) -> void:
-	"""Set speed modifier for spells like SLOW"""
 	if movement_component:
 		movement_component.set_speed_modifier(modifier)

@@ -1,11 +1,14 @@
-[gd_scene load_steps=75 format=3 uid="uid://crn7vpixxryln"]
+[gd_scene load_steps=78 format=3 uid="uid://crn7vpixxryln"]
 
 [ext_resource type="Script" uid="uid://djpa8wx3hw4kr" path="res://scripts/enemies/enemy.gd" id="1_rg13m"]
 [ext_resource type="Texture2D" uid="uid://gxbuhqo60nbt" path="res://assets/art/characters/Orc-Peon-Cyan.png" id="2_rg13m"]
 [ext_resource type="Script" uid="uid://jkh6cfypyvky" path="res://scripts/components/animation_component.gd" id="3_rmgja"]
+[ext_resource type="AudioStream" uid="uid://con3uns61rl4p" path="res://assets/sound/attacks_and_mosnters/sword_attack_2.wav" id="4_4etdi"]
 [ext_resource type="Script" uid="uid://dvhqgghmcj6al" path="res://scripts/components/health_component.gd" id="4_7oo8o"]
 [ext_resource type="Script" uid="uid://brjkec8lpyla6" path="res://scripts/components/movement_component.gd" id="5_a6h4t"]
+[ext_resource type="AudioStream" uid="uid://ryxnhv1e5vg8" path="res://assets/sound/attacks_and_mosnters/goblin_death.wav" id="5_c4rmq"]
 [ext_resource type="Script" uid="uid://wiwp5n7puq5c" path="res://scripts/components/attack_component.gd" id="6_24dmj"]
+[ext_resource type="AudioStream" uid="uid://bh6ik5xi0y0i8" path="res://assets/sound/attacks_and_mosnters/goblin_sound_2.wav" id="6_gcuuc"]
 [ext_resource type="Script" uid="uid://c3mlvtl03wubw" path="res://scripts/components/sound_component.gd" id="SoundComp_SCRIPT"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dq0xf"]
@@ -611,6 +614,9 @@ show_percentage = false
 
 [node name="SoundComponent" type="Node2D" parent="."]
 script = ExtResource("SoundComp_SCRIPT")
+attack_sound = ExtResource("4_4etdi")
+death_sound = ExtResource("5_c4rmq")
+hit_sound = ExtResource("6_gcuuc")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("4_7oo8o")

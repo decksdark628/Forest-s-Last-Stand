@@ -6,34 +6,37 @@ class_name SoundComponent
 @export var hit_sound: AudioStream
 @export var walk_sound: AudioStream
 
+const PITCH_VARIATION_MIN: float = 0.9
+const PITCH_VARIATION_MAX: float = 1.1
+const DEFAULT_SFX_BUS: String = "SFX"
+
 @onready var audio_player: AudioStreamPlayer2D = AudioStreamPlayer2D.new()
 
-func _ready():
+func _ready() -> void:
 	add_child(audio_player)
-	audio_player.bus = "SFX"
+	audio_player.bus = DEFAULT_SFX_BUS
 
-func play_attack():
-	if attack_sound: play_sound(attack_sound)
+func play_attack() -> void:
+	if attack_sound:
+		play_sound(attack_sound)
 
-func play_death():
-	if death_sound: play_sound(death_sound)
+func play_death() -> void:
+	if death_sound:
+		play_sound(death_sound)
 
-func play_hit():
-	if hit_sound: play_sound(hit_sound)
+func play_hit() -> void:
+	if hit_sound:
+		play_sound(hit_sound)
 
-func play_walk():
+func play_walk() -> void:
 	if walk_sound and not audio_player.playing:
-		play_sound(walk_sound, 0.9, 1.1)
+		play_sound(walk_sound, PITCH_VARIATION_MIN, PITCH_VARIATION_MAX)
 
-func play_custom(stream: AudioStream):
+func play_custom(stream: AudioStream) -> void:
 	play_sound(stream)
 
-func play_sound(stream: AudioStream, min_pitch: float = 0.9, max_pitch: float = 1.1):
+func play_sound(stream: AudioStream, min_pitch: float = PITCH_VARIATION_MIN, max_pitch: float = PITCH_VARIATION_MAX) -> void:
 	if stream:
-		# If it's the same stream and already playing, maybe don't restart? 
-		# For attacks we usually want to restart or allow overlap (polyphony).
-		# AudioStreamPlayer2D is monophonic by default unless instantiated multiple times.
-		# For this component, we'll interrupt.
 		audio_player.stream = stream
 		audio_player.pitch_scale = randf_range(min_pitch, max_pitch)
 		audio_player.play()

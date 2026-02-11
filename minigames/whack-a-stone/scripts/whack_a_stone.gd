@@ -37,6 +37,11 @@ func _on_button_pressed() -> void:
 		SceneTransition.fade_out(0.3)
 		await SceneTransition.fade_out_finished
 	get_tree().paused = false
+	
+
+	if SoundManager and SoundManager.current_scene == "town":
+		SoundManager.resume_music()
+	
 	queue_free()
 	if SceneTransition:
 		SceneTransition.fade_in(0.3)

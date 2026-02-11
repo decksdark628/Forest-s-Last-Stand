@@ -23,6 +23,7 @@ boot_splash/minimum_display_time=3500
 
 SessionPersistence="*res://scripts/models/session_persistence.gd"
 SceneTransition="*res://scripts/ui/scene_transition.gd"
+SoundManager="*res://scripts/controllers/sound_manager.gd"
 
 [display]
 

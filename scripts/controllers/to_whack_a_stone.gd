@@ -15,9 +15,7 @@ func _on_body_exited(body: Node2D):
 func _input(event: InputEvent):
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_E and player_in_area:
-			# marcamos el input como manejado PRIMERO
 			get_viewport().set_input_as_handled()
-			# luego hacemos la transición
 			_enter_whack_a_stone_minigame()
 		
 func _enter_whack_a_stone_minigame():
@@ -27,6 +25,10 @@ func _do_enter_with_fade() -> void:
 	if SceneTransition:
 		SceneTransition.fade_out(0.3)
 		await SceneTransition.fade_out_finished
+	
+	if SoundManager and SoundManager.current_scene == "town":
+		SoundManager.pause_music()
+	
 	var minigame_scene = load(whack_a_stone_scene_path)
 	var minigame_instance = minigame_scene.instantiate()
 	get_tree().root.add_child(minigame_instance)

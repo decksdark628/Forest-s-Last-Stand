@@ -45,8 +45,6 @@ func _ready() -> void:
 		hammer._lock_input()
 		_show_end_message()
 	)
-	
-	# Connect button signal
 	button.pressed.connect(_on_button_pressed)
 
 func start_game():
@@ -99,9 +97,7 @@ func _show_end_message() -> void:
 		message_label.text = "Intento fallido"
 	else:
 		message_label.text = "Mejora Lograda"
-		# Emit signal to notify that improvement was achieved
 		blacksmith_improvement_achieved.emit()
-		# Store in engine metadata so placement_menu can detect it
 		Engine.set_meta("blacksmith_improvement_achieved", true)
 
 func _on_button_pressed() -> void:
@@ -109,6 +105,10 @@ func _on_button_pressed() -> void:
 		SceneTransition.fade_out(0.3)
 		await SceneTransition.fade_out_finished
 	get_tree().paused = false
+	
+	if SoundManager and SoundManager.current_scene == "town":
+		SoundManager.resume_music()
+	
 	queue_free()
 	if SceneTransition:
 		SceneTransition.fade_in(0.3)

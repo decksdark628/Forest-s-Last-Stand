@@ -1,10 +1,13 @@
-[gd_scene load_steps=68 format=3 uid="uid://daeju8f64g16j"]
+[gd_scene load_steps=71 format=3 uid="uid://daeju8f64g16j"]
 
 [ext_resource type="Script" uid="uid://djpa8wx3hw4kr" path="res://scripts/enemies/enemy.gd" id="1_orc"]
 [ext_resource type="Texture2D" uid="uid://b1e1fosgqgev7" path="res://assets/art/characters/Orc-Peon-Red.png" id="2_sprite"]
 [ext_resource type="Script" uid="uid://jkh6cfypyvky" path="res://scripts/components/animation_component.gd" id="3_anim"]
+[ext_resource type="AudioStream" uid="uid://con3uns61rl4p" path="res://assets/sound/attacks_and_mosnters/sword_attack_2.wav" id="4_ijoep"]
 [ext_resource type="Script" uid="uid://dvhqgghmcj6al" path="res://scripts/components/health_component.gd" id="4_v1a56"]
 [ext_resource type="Script" uid="uid://brjkec8lpyla6" path="res://scripts/components/movement_component.gd" id="5_d03pg"]
+[ext_resource type="AudioStream" uid="uid://ryxnhv1e5vg8" path="res://assets/sound/attacks_and_mosnters/goblin_death.wav" id="5_gekj1"]
+[ext_resource type="AudioStream" uid="uid://bv12j38r0f8if" path="res://assets/sound/attacks_and_mosnters/goblin_sound_1.wav" id="6_ex58x"]
 [ext_resource type="Script" uid="uid://wiwp5n7puq5c" path="res://scripts/components/attack_component.gd" id="6_rso2t"]
 [ext_resource type="Script" uid="uid://dgcrswdoodyio" path="res://scripts/components/aggro_component.gd" id="8_ijoep"]
 [ext_resource type="Script" uid="uid://c3mlvtl03wubw" path="res://scripts/components/sound_component.gd" id="SoundComp_SCRIPT"]
@@ -510,6 +513,7 @@ animations = [{
 radius = 16.0
 
 [node name="OrcPeon" type="CharacterBody2D"]
+collision_mask = 2
 script = ExtResource("1_orc")
 max_health = 50
 speed = 60.0
@@ -551,6 +555,9 @@ show_percentage = false
 
 [node name="SoundComponent" type="Node2D" parent="."]
 script = ExtResource("SoundComp_SCRIPT")
+attack_sound = ExtResource("4_ijoep")
+death_sound = ExtResource("5_gekj1")
+hit_sound = ExtResource("6_ex58x")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("4_v1a56")

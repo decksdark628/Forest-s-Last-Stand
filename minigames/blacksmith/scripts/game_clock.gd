@@ -20,7 +20,6 @@ func init_timer(bpm:int) -> void:
 func _on_tick():
 	tick_count += 1
 	tick.emit(tick_count)
-	#print(str(tick_count))
 
 func get_time_since_last_tick() -> float:
 	return beat_length - timer.time_left

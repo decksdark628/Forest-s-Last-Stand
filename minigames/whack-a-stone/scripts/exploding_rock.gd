@@ -15,8 +15,6 @@ signal rock_exploded(rock)
 
 func _ready() -> void:
 	hp = MAX_HP
-	#hb_bottom.disabled = true
-	#hb_top.disabled = true
 	var tw = create_tween().set_parallel()
 	tw.tween_property(
 		visuals,
@@ -43,14 +41,6 @@ func _ready() -> void:
 		0,
 		2.5
 	)
-	#await get_tree().create_timer(1).timeout
-	#hb_bottom.disabled = false
-	#await get_tree().create_timer(0.8).timeout
-	#hb_top.disabled = false
-	#await get_tree().create_timer(4.5).timeout
-	#hb_top.disabled = true
-	#await get_tree().create_timer(1.2).timeout
-	#hb_bottom.disabled = true
 	
 	var rand_wait:float = randf_range(2, 7)
 	await get_tree().create_timer(rand_wait).timeout

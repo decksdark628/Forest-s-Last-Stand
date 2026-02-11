@@ -1,7 +1,6 @@
 extends Control
 
 func _ready():
-	# Conectar botones a funciones usando la sintaxis de señales de Godot 4
 	var start_button = $VBoxContainer/PanelContainer/StartButton as Button
 	var quit_button = $VBoxContainer/PanelContainer2/QuitButton as Button
 	
@@ -11,6 +10,9 @@ func _ready():
 	
 	if quit_button:
 		quit_button.pressed.connect(_on_quit_button_pressed)
+	
+	
+	SoundManager.play_music_for_scene("main_menu")
 
 func _on_start_button_pressed():
 	await SceneTransition.transition_to_scene(

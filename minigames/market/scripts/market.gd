@@ -1,22 +1,14 @@
 extends CanvasLayer
-## Minijuego Mercado: comprar/vender recursos y mejorar hacha y picota.
-## Recursos y dinero se pasan desde town (como en ruleta). Actualiza GameManager al comprar/vender/mejorar.
-
-# Recursos actuales (pasados desde town)
 var current_gold: int = 0
 var current_wood: int = 0
 var current_stone: int = 0
 var initial_gold: int = 0
 var initial_wood: int = 0
 var initial_stone: int = 0
-
-# Precios fijos
 const WOOD_BUY_PRICE: int = 10
 const WOOD_SELL_PRICE: int = 5
 const ROCK_BUY_PRICE: int = 15
 const ROCK_SELL_PRICE: int = 7
-
-# Precios por tier: axe [tier1->2, tier2->3], mismo orden para gold/stone/wood
 const AXE_GOLD: Array[int] = [50, 100]
 const AXE_STONE: Array[int] = [10, 20]
 const AXE_WOOD: Array[int] = [8, 15]
@@ -25,8 +17,6 @@ const PICKAXE_STONE: Array[int] = [15, 30]
 const PICKAXE_WOOD: Array[int] = [10, 20]
 
 const MAX_TOOL_TIER: int = 3
-
-# Nodos UI (script en Market CanvasLayer, hijo PanelContainer)
 @onready var money_label: Label = $PanelContainer/MarginContainer/Header/Money
 @onready var wood_label: Label = $PanelContainer/MarginContainer/Header/Wood
 @onready var stone_label: Label = $PanelContainer/MarginContainer/Header/Stone

@@ -8,110 +8,111 @@ var last_direction: Vector2 = Vector2(0, 1)
 var is_casting: bool = false
 var is_dying: bool = false
 
-func update_animation(direction: Vector2, is_attacking: bool = false, attack_target: Node2D = null):
+const ANIMATION_DIRECTION_SUFFIXES: PackedStringArray = ["e", "se", "s", "sw", "w", "nw", "n", "ne"]
+const ANIMATION_DEFAULT_DURATION: float = 0.6
+
+func update_animation(direction: Vector2, is_attacking: bool = false, attack_target: Node2D = null) -> void:
 	if not animated_sprite or is_casting or is_dying:
 		return
-	
 	if direction.length() > 0:
 		last_direction = direction
+	var animation_name = _get_animation_name(direction, is_attacking, attack_target)
+	_play_animation(animation_name)
 
-	var suffix = get_direction_suffix(direction if direction.length() > 0 else last_direction)
-	var animation_name = "idle_" + suffix
-
-	# Fallback to generic idle if directional idle missing
-	if not animated_sprite.sprite_frames.has_animation(animation_name):
-		if animated_sprite.sprite_frames.has_animation("idle"):
-			animation_name = "idle"
-
-	# Movimiento
-	if direction.length() > 0:
-		animation_name = "walk_" + suffix
-	
-	# Ataque
+func _get_animation_name(direction: Vector2, is_attacking: bool, attack_target: Node2D) -> String:
 	if is_attacking:
-		var attack_dir = direction
-		if attack_target and is_instance_valid(attack_target):
-			attack_dir = (attack_target.global_position - get_parent().global_position).normalized()
-		elif direction.length() == 0:
-			attack_dir = last_direction
-		
-		var attack_suffix = get_direction_suffix(attack_dir)
-		animation_name = "attack_" + attack_suffix
+		return _get_attack_animation_name(direction, attack_target)
+	if direction.length() > 0:
+		return _get_movement_animation_name(direction)
+	return _get_idle_animation_name(last_direction)
 
+func _get_idle_animation_name(direction: Vector2) -> String:
+	var suffix = get_direction_suffix(direction)
+	var animation_name = "idle_" + suffix
+	if not animated_sprite.sprite_frames.has_animation(animation_name):
+		animation_name = "idle" if animated_sprite.sprite_frames.has_animation("idle") else "idle_s"
+	return animation_name
+
+func _get_movement_animation_name(direction: Vector2) -> String:
+	return "walk_" + get_direction_suffix(direction)
+
+func _get_attack_animation_name(direction: Vector2, attack_target: Node2D) -> String:
+	var attack_dir = direction
+	if attack_target and is_instance_valid(attack_target):
+		attack_dir = (attack_target.global_position - get_parent().global_position).normalized()
+	elif direction.length() == 0:
+		attack_dir = last_direction
+	
+	var attack_suffix = get_direction_suffix(attack_dir)
+	var animation_name = "attack_" + attack_suffix
+	if not animated_sprite.sprite_frames.has_animation(animation_name):
+		animation_name = "attack_s" if animated_sprite.sprite_frames.has_animation("attack_s") else animation_name
+	return animation_name
+
+func _play_animation(animation_name: String) -> void:
 	if animated_sprite.sprite_frames.has_animation(animation_name):
 		if animated_sprite.animation != animation_name:
 			animated_sprite.play(animation_name)
-	elif is_attacking:
-		if animated_sprite.sprite_frames.has_animation("attack_s"):
-			animated_sprite.play("attack_s")
 
-func play_death():
-	if not animated_sprite: return
+func play_death() -> void:
+	if not animated_sprite:
+		return
 	is_dying = true
 	if animated_sprite.sprite_frames.has_animation("death"):
 		animated_sprite.stop()
 		animated_sprite.play("death")
 		await animated_sprite.animation_finished
 
-func play_cast(direction: Vector2):
-	if not animated_sprite: return
+func play_cast(direction: Vector2) -> void:
+	if not animated_sprite:
+		return
 	is_casting = true
 	
 	var suffix = get_direction_suffix(direction)
 	var anim_name = "cast_" + suffix
-	
-	# Fallback to attack if cast not found
 	if not animated_sprite.sprite_frames.has_animation(anim_name):
 		anim_name = "attack_" + suffix
 	
 	if animated_sprite.sprite_frames.has_animation(anim_name):
 		animated_sprite.play(anim_name)
-		# Calculate duration for manual timeout (safer for looping/non-looping consistency)
-		var duration = _get_animation_duration(anim_name)
+		var duration = _calculate_animation_duration(anim_name)
 		await get_tree().create_timer(duration).timeout
 	else:
-		await get_tree().create_timer(0.5).timeout
-		
+		await get_tree().create_timer(ANIMATION_DEFAULT_DURATION).timeout
+	
 	is_casting = false
-	# Force update to return to idle/walk
 	update_animation(direction if direction.length() > 0 else last_direction)
 
 func get_direction_suffix(angle_or_vector) -> String:
-	var angle = 0.0
+	var angle = _extract_angle(angle_or_vector)
+	return ANIMATION_DIRECTION_SUFFIXES[_get_direction_index(angle)]
+
+func _extract_angle(angle_or_vector) -> float:
 	if angle_or_vector is Vector2:
-		angle = angle_or_vector.angle()
+		return angle_or_vector.angle()
 	elif angle_or_vector is float or angle_or_vector is int:
-		angle = angle_or_vector
-	else:
-		return "s"
-		
-	var suffixes = ["e", "se", "s", "sw", "w", "nw", "n", "ne"]
-	
-	var normalized_angle = angle + PI / 8
+		return float(angle_or_vector)
+	return 0.0
+
+func _get_direction_index(angle: float) -> int:
+	var normalized_angle = fmod(angle + PI / 8, 2 * PI)
 	if normalized_angle < 0:
 		normalized_angle += 2 * PI
-	normalized_angle = fmod(normalized_angle, 2 * PI)
-	
 	var index = int(normalized_angle / (PI / 4))
-	index = index % 8
-	
-	return suffixes[index]
+	return index % 8
 
-func _get_animation_duration(anim_name: String) -> float:
+func _calculate_animation_duration(anim_name: String) -> float:
 	if not animated_sprite or not animated_sprite.sprite_frames:
-		return 0.6
+		return ANIMATION_DEFAULT_DURATION
 	if not animated_sprite.sprite_frames.has_animation(anim_name):
-		return 0.6
+		return ANIMATION_DEFAULT_DURATION
 	
 	var frame_count = animated_sprite.sprite_frames.get_frame_count(anim_name)
 	var fps = animated_sprite.sprite_frames.get_animation_speed(anim_name)
-	if fps <= 0: fps = 5.0
+	if fps <= 0:
+		fps = 5.0
 	
 	var total_duration: float = 0.0
 	for i in range(frame_count):
 		total_duration += animated_sprite.sprite_frames.get_frame_duration(anim_name, i) / fps
 	return total_duration
-
-# Compatibility
-func get_direction_animation(angle):
-	return "walk_" + get_direction_suffix(angle)

@@ -18,8 +18,9 @@ func _ready() -> void:
 func decrease_hp(n:int):
 	hp -= n
 	if hp <= 0:
+		play_tree_explode_sound()
 		segment_died.emit()
-	_update_breaking_anim()
+		_update_breaking_anim()
 
 func set_branch(b:Branch):
 	branch = b
@@ -41,6 +42,13 @@ func _update_breaking_anim():
 
 func throw_particles():
 	cpu_particles_2d.emitting = true
+
+func play_tree_explode_sound():
+	var sound_path = "res://minigames/woodchopper/music/tree_explodes_shorter.wav"
+	if ResourceLoader.exists(sound_path):
+		var sound = load(sound_path)
+		if SoundManager and sound:
+			SoundManager.play_global_sfx(sound)
 
 func _update_sprite():
 	match branch:

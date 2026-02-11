@@ -294,27 +294,38 @@ scale = Vector2(0.27, 0.27)
 [node name="Sprite2D" type="Sprite2D" parent="ClockIcon"]
 texture = ExtResource("10_1xtpx")
 
-[node name="WoodCounter" type="Label" parent="."]
-offset_left = 1071.0
-offset_top = 28.0
-offset_right = 1265.0
-offset_bottom = 119.0
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 20
-theme_override_fonts/font = ExtResource("9_71l07")
-theme_override_font_sizes/font_size = 70
-text = "0"
-
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(640, 360)
 
-[node name="WoodIcon" type="Node2D" parent="."]
-position = Vector2(1010, 80)
+[node name="WoodIcon" type="HBoxContainer" parent="."]
+anchors_preset = -1
+anchor_left = 0.606
+anchor_right = 0.606
+offset_left = 343.32
+offset_top = 26.0
+offset_right = 847.32
+offset_bottom = 276.0
+grow_horizontal = 0
 scale = Vector2(0.25, 0.25)
+size_flags_horizontal = 3
+size_flags_vertical = 4
 
-[node name="Sprite2D" type="Sprite2D" parent="WoodIcon"]
-position = Vector2(580, -3.9999998)
-scale = Vector2(8, 8)
+[node name="WoodCounter" type="Label" parent="WoodIcon"]
+custom_minimum_size = Vector2(250, 250)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 20
+theme_override_fonts/font = ExtResource("9_71l07")
+theme_override_font_sizes/font_size = 200
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Sprite2D" type="TextureRect" parent="WoodIcon"]
+custom_minimum_size = Vector2(250, 250)
+layout_mode = 2
+size_flags_horizontal = 3
 texture = ExtResource("11_8y6rm")
 
 [node name="GameOverScreen" type="Node2D" parent="."]

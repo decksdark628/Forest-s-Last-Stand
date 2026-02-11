@@ -521,8 +521,6 @@ scale = Vector2(0.4, 0.4)
 sprite_frames = SubResource("SpriteFrames_dqwoj")
 animation = &"Animation"
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Heal"]
-
 [node name="Shield" type="Node" parent="."]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Shield"]
@@ -532,8 +530,6 @@ sprite_frames = SubResource("SpriteFrames_k0jfd")
 animation = &"Animation"
 frame = 4
 frame_progress = 0.9145137
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Shield"]
 
 [node name="Slow" type="Node" parent="."]
 
@@ -553,13 +549,9 @@ rotation = -1.6118232
 shape = SubResource("CapsuleShape2D_ka5si")
 debug_color = Color(0.827451, 0.90588236, 0.99215686, 1)
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Slow"]
-
 [node name="Buff" type="Node" parent="."]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Buff"]
 scale = Vector2(0.4, 0.4)
 sprite_frames = SubResource("SpriteFrames_scko3")
 animation = &"Animation"
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Buff"]

@@ -19,19 +19,8 @@ func _on_body_exited(body: Node2D):
 func _input(event: InputEvent):
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_E and player_in_area:
-			# marcamos el input como manejado PRIMERO
 			get_viewport().set_input_as_handled()
-			# luego hacemos la transición
 			_enter_woodchopper_minigame()
-			#get_tree().root.set_input_as_handled() //daba muchos errores
-
-#func _enter_woodchopper_minigame():
-	#print("[toWoodChopper] Entering woodchopper minigame")
-	## verificacion de seguridad
-	#if FileAccess.file_exists(woodchopper_scene_path):
-		#get_tree().change_scene_to_file(woodchopper_scene_path)
-	#else:
-		#push_error("Error: No se encuentra la escena en: " + woodchopper_scene_path)
 		
 func _enter_woodchopper_minigame():
 	_do_enter_with_fade()
@@ -40,6 +29,10 @@ func _do_enter_with_fade() -> void:
 	if SceneTransition:
 		SceneTransition.fade_out(0.3)
 		await SceneTransition.fade_out_finished
+	
+	if SoundManager and SoundManager.current_scene == "town":
+		SoundManager.pause_music()
+	
 	var minigame_scene = load(woodchopper_scene_path)
 	var minigame_instance = minigame_scene.instantiate()
 	get_tree().root.add_child(minigame_instance)
